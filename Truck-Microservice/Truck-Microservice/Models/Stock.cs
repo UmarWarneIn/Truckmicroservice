@@ -1,9 +1,25 @@
-﻿namespace Truck_Microservice.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace Truck_Microservice.Models
 {
-    public class Stock
+    public class StockItem
     {
-        public int ProjectId { get; set; }
-        public string Load { get; set; }
+        public int StockItemId { get; set; }
+        public string Name { get; set; }
         public int Quantity { get; set; }
+        // Add other properties as needed
+    }
+
+    public class StockLoadingRequest
+    {
+        public List<StockItem> Items { get; set; }
+        // Add other properties as needed
+    }
+
+    public class StockOffloadingRequest
+    {
+        public List<StockItem> Items { get; set; }
+        // Add other properties as needed
     }
 }
