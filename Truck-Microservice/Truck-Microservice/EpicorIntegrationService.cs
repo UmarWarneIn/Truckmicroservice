@@ -1,4 +1,6 @@
-﻿using System.Net.Http;
+﻿//This file contains the EpicorIntegrationService class.
+//It encapsulates logic for integrating with the Epicor system, such as loading and offloading stock.
+using System.Net.Http;
 using System.Threading.Tasks;
 using Truck_Microservice.Models;
 

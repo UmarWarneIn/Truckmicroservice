@@ -1,56 +1,66 @@
-﻿using System.Net.Http;
+﻿// Controllers/StockController.cs
+using System.Linq;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
 using Truck_Microservice.Models;
 
 namespace Truck_Microservice.Controllers
 {
-    public class StockController : ApiController
+    [Route("api/[controller]")]
+    [ApiController]
+    public class StockController : ControllerBase
     {
-        private readonly HttpClient _httpClient;
+        private readonly TruckContext _context;
 
-        // Constructor to initialize HttpClient
-        public StockController(HttpClient httpClient)
+        public StockController(TruckContext context)
         {
-            _httpClient = httpClient;
+            _context = context;
         }
 
-        // Endpoint for loading stock
-        [HttpPost]
-        public async Task<IHttpActionResult> LoadStock(StockLoadingRequest stockRequest)
+        [HttpPost("loading")]
+        public async Task<IActionResult> LoadStock([FromBody] StockLoadingRequest request)
         {
-            // Check if the received data is valid
             if (!ModelState.IsValid)
-                return BadRequest(ModelState); // Return bad request if data is not valid
+                return BadRequest(ModelState);
 
-            // Logic to validate stock data before loading
-            // You can implement custom validation logic here
+            // Validate stock loading request
+            // Implement validation logic here
 
-            // Make HTTP request to Epicor API to load stock
-            var response = await _httpClient.PostAsJsonAsync("https://77.92.189.102/IITPrecastVertical/Apps/RestHelp/stock/load", stockRequest);
-            if (!response.IsSuccessStatusCode) // Check if the request was successful
-                return InternalServerError(); // Return internal server error if request was not successful
+            // Assuming successful validation, proceed with loading
+            foreach (var item in request.Items)
+            {
+                _context.StockItems.Add(item);
+            }
 
-            return Ok(); // Return OK response if stock loading was successful
+            await _context.SaveChangesAsync();
+
+            return Ok(request);
         }
 
-        // Endpoint for offloading stock
-        [HttpPost]
-        public async Task<IHttpActionResult> OffloadStock(StockOffloadingRequest stockRequest)
+        [HttpPost("offloading")]
+        public async Task<IActionResult> UnloadStock([FromBody] StockOffloadingRequest request)
         {
-            // Check if the received data is valid
             if (!ModelState.IsValid)
-                return BadRequest(ModelState); // Return bad request if data is not valid
+                return BadRequest(ModelState);
 
-            // Logic to validate stock data before offloading
-            // You can implement custom validation logic here
+            // Validate stock offloading request
+            // Implement validation logic here
 
-            // Make HTTP request to Epicor API to offload stock
-            var response = await _httpClient.PostAsJsonAsync("https://77.92.189.102/IITPrecastVertical/Apps/RestHelp/stock/offload", stockRequest);
-            if (!response.IsSuccessStatusCode) // Check if the request was successful
-                return InternalServerError(); // Return internal server error if request was not successful
+            // Assuming successful validation, proceed with offloading
+            foreach (var item in request.Items)
+            {
+                var existingItem = _context.StockItems.FirstOrDefault(s => s.StockItemId == item.StockItemId);
+                if (existingItem != null)
+                {
+                    existingItem.Quantity -= item.Quantity;
+                    // Update other properties as needed
+                }
+                // Handle case if item not found or quantity exceeds available quantity
+            }
 
-            return Ok(); // Return OK response if stock offloading was successful
+            await _context.SaveChangesAsync();
+
+            return Ok(request);
         }
     }
 }
