@@ -1,9 +1,6 @@
-﻿// This file contains the TrucksController class, which is an API controller for handling CRUD
-// operations related to trucks.
-//It defines HTTP endpoints for retrieving, creating, updating, and deleting trucks.
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Mvc;
 using Truck_Microservice.Models;
 
 namespace Truck_Microservice.Controllers
@@ -19,13 +16,21 @@ namespace Truck_Microservice.Controllers
             _context = context;
         }
 
+        
+        /// Get all trucks
+        /// <returns>List of trucks</returns>
         [HttpGet]
+        [Route("api/trucks/getalltrucks")]
         public IActionResult GetAllTrucks()
         {
             return Ok(_context.Trucks.ToList());
         }
 
+        /// Get a truck by ID
+        /// <param name="id">Truck ID</param>
+        /// <returns>Truck object</returns>
         [HttpGet("{id}")]
+        [Route("api/trucks/gettruckbyid/{id}")]
         public IActionResult GetTruckById(int id)
         {
             var truck = _context.Trucks.FirstOrDefault(t => t.TruckId == id);
@@ -35,7 +40,12 @@ namespace Truck_Microservice.Controllers
             return Ok(truck);
         }
 
+       
+        /// Create a new truck
+        /// <param name="truck">Truck object</param>
+        /// <returns>Created truck</returns>
         [HttpPost]
+        [Route("api/trucks/createtruck")]
         public IActionResult CreateTruck([FromBody] Truck truck)
         {
             if (!ModelState.IsValid)
@@ -47,7 +57,12 @@ namespace Truck_Microservice.Controllers
             return Ok(truck);
         }
 
+        /// Update an existing truck
+        /// <param name="id">Truck ID</param>
+        /// <param name="truck">Updated truck object</param>
+        /// <returns>Updated truck</returns>
         [HttpPut("{id}")]
+        [Route("api/trucks/updatetruck/{id}")]
         public IActionResult UpdateTruck(int id, [FromBody] Truck truck)
         {
             if (!ModelState.IsValid)
@@ -65,7 +80,12 @@ namespace Truck_Microservice.Controllers
             return Ok(existingTruck);
         }
 
+    
+        /// Delete a truck by ID
+        /// <param name="id">Truck ID</param>
+        /// <returns>Deleted truck</returns>
         [HttpDelete("{id}")]
+        [Route("api/trucks/deletetruck/{id}")]
         public IActionResult DeleteTruck(int id)
         {
             var truck = _context.Trucks.FirstOrDefault(t => t.TruckId == id);
