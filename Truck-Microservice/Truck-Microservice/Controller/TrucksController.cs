@@ -1,36 +1,35 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using Truck_Microservice.Models;
 
 namespace Truck_Microservice.Controllers
 {
+    // This controller manages API requests related to trucks
     [Route("api/[controller]")]
     [ApiController]
     public class TrucksController : ControllerBase
     {
         private readonly TruckContext _context;
+        private readonly EpicorIntegrationService _epicorService;
 
-        public TrucksController(TruckContext context)
+        // Constructor to initialize the TruckContext and EpicorIntegrationService
+        public TrucksController(TruckContext context, EpicorIntegrationService epicorService)
         {
             _context = context;
+            _epicorService = epicorService;
         }
 
-        
-        /// Get all trucks
-        /// <returns>List of trucks</returns>
+        // GET: api/trucks
+        // Fetches all trucks from the database
         [HttpGet]
-        [Route("api/trucks/getalltrucks")]
         public IActionResult GetAllTrucks()
         {
             return Ok(_context.Trucks.ToList());
         }
 
-        /// Get a truck by ID
-        /// <param name="id">Truck ID</param>
-        /// <returns>Truck object</returns>
+        // GET: api/trucks/{id}
+        // Fetches a specific truck by its ID from the database
         [HttpGet("{id}")]
-        [Route("api/trucks/gettruckbyid/{id}")]
         public IActionResult GetTruckById(int id)
         {
             var truck = _context.Trucks.FirstOrDefault(t => t.TruckId == id);
@@ -40,12 +39,9 @@ namespace Truck_Microservice.Controllers
             return Ok(truck);
         }
 
-       
-        /// Create a new truck
-        /// <param name="truck">Truck object</param>
-        /// <returns>Created truck</returns>
+        // POST: api/trucks
+        // Creates a new truck in the database
         [HttpPost]
-        [Route("api/trucks/createtruck")]
         public IActionResult CreateTruck([FromBody] Truck truck)
         {
             if (!ModelState.IsValid)
@@ -57,12 +53,9 @@ namespace Truck_Microservice.Controllers
             return Ok(truck);
         }
 
-        /// Update an existing truck
-        /// <param name="id">Truck ID</param>
-        /// <param name="truck">Updated truck object</param>
-        /// <returns>Updated truck</returns>
+        // PUT: api/trucks/{id}
+        // Updates an existing truck in the database
         [HttpPut("{id}")]
-        [Route("api/trucks/updatetruck/{id}")]
         public IActionResult UpdateTruck(int id, [FromBody] Truck truck)
         {
             if (!ModelState.IsValid)
@@ -80,12 +73,9 @@ namespace Truck_Microservice.Controllers
             return Ok(existingTruck);
         }
 
-    
-        /// Delete a truck by ID
-        /// <param name="id">Truck ID</param>
-        /// <returns>Deleted truck</returns>
+        // DELETE: api/trucks/{id}
+        // Deletes a truck from the database
         [HttpDelete("{id}")]
-        [Route("api/trucks/deletetruck/{id}")]
         public IActionResult DeleteTruck(int id)
         {
             var truck = _context.Trucks.FirstOrDefault(t => t.TruckId == id);
@@ -96,6 +86,32 @@ namespace Truck_Microservice.Controllers
             _context.SaveChanges();
 
             return Ok(truck);
+        }
+
+        // GET: api/trucks/epicor/load/{id}
+        // Loads stock data from Epicor for a specific truck
+        [HttpGet("epicor/load/{id}")]
+        public async Task<IActionResult> LoadTruckFromEpicor(int id)
+        {
+            var response = await _epicorService.LoadStockAsync(id);
+            if (!response.IsSuccessStatusCode)
+                return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+
+            var stock = await response.Content.ReadAsAsync<StockItem>();
+            return Ok(stock);
+        }
+
+        // GET: api/trucks/epicor/offload/{id}
+        // Offloads stock data from Epicor for a specific truck
+        [HttpGet("epicor/offload/{id}")]
+        public async Task<IActionResult> OffloadTruckFromEpicor(int id)
+        {
+            var response = await _epicorService.OffloadStockAsync(id);
+            if (!response.IsSuccessStatusCode)
+                return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+
+            var stock = await response.Content.ReadAsAsync<StockItem>();
+            return Ok(stock);
         }
     }
 }

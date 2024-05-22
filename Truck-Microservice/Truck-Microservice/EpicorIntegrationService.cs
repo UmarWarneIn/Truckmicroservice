@@ -1,6 +1,4 @@
-﻿//This file contains the EpicorIntegrationService class.
-//It encapsulates logic for integrating with the Epicor system, such as loading and offloading stock.
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using Truck_Microservice.Models;
 
@@ -8,22 +6,23 @@ public class EpicorIntegrationService
 {
     private readonly HttpClient _httpClient;
 
+    // Constructor to initialize the HttpClient
     public EpicorIntegrationService(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
 
-    public async Task<HttpResponseMessage> LoadStockAsync(StockLoadingRequest stock)
+    // Sends a GET request to Epicor API to load stock data for a specific truck
+    public async Task<HttpResponseMessage> LoadStockAsync(int truckId)
     {
-        // Make HTTP request to Epicor API to load stock
-        var response = await _httpClient.PostAsJsonAsync("https://77.92.189.102/IITPrecastVertical/Apps/RestHelp/stock/load", stock);
+        var response = await _httpClient.GetAsync($"https://77.92.189.102/IITPrecastVertical/Apps/RestHelp/stock/load/{truckId}");
         return response;
     }
 
-    public async Task<HttpResponseMessage> UnloadStockAsync(StockOffloadingRequest stock)
+    // Sends a GET request to Epicor API to offload stock data for a specific truck
+    public async Task<HttpResponseMessage> OffloadStockAsync(int truckId)
     {
-        // Make HTTP request to Epicor API to unload stock
-        var response = await _httpClient.PostAsJsonAsync("https://77.92.189.102/IITPrecastVertical/Apps/RestHelp/stock/unload", stock);
+        var response = await _httpClient.GetAsync($"https://77.92.189.102/IITPrecastVertical/Apps/RestHelp/stock/offload/{truckId}");
         return response;
     }
 }

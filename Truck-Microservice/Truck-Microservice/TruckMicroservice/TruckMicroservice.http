@@ -1,6 +1,0 @@
-@TruckMicroservice_HostAddress = http://localhost:5008
-
-GET {{TruckMicroservice_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
