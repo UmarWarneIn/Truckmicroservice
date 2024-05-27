@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Threading.Tasks;
+using Truck_Microservice.Data;
 using Truck_Microservice.Models;
 
 namespace Truck_Microservice.Controllers
 {
-    // This controller manages API requests related to trucks
     [Route("api/[controller]")]
     [ApiController]
     public class TrucksController : ControllerBase
@@ -12,35 +13,29 @@ namespace Truck_Microservice.Controllers
         private readonly TruckContext _context;
         private readonly EpicorIntegrationService _epicorService;
 
-        // Constructor to initialize the TruckContext and EpicorIntegrationService
         public TrucksController(TruckContext context, EpicorIntegrationService epicorService)
         {
             _context = context;
             _epicorService = epicorService;
         }
 
-        // GET: api/trucks
-        // Fetches all trucks from the database
         [HttpGet]
         public IActionResult GetAllTrucks()
         {
-            return Ok(_context.Trucks.ToList());
+            var trucks = _context.Trucks.ToList();
+            return Ok(trucks);
         }
 
-        // GET: api/trucks/{id}
-        // Fetches a specific truck by its ID from the database
         [HttpGet("{id}")]
         public IActionResult GetTruckById(int id)
         {
-            var truck = _context.Trucks.FirstOrDefault(t => t.TruckId == id);
+            var truck = _context.Trucks.FirstOrDefault(t => t.key1 == id);
             if (truck == null)
                 return NotFound();
 
             return Ok(truck);
         }
 
-        // POST: api/trucks
-        // Creates a new truck in the database
         [HttpPost]
         public IActionResult CreateTruck([FromBody] Truck truck)
         {
@@ -53,32 +48,28 @@ namespace Truck_Microservice.Controllers
             return Ok(truck);
         }
 
-        // PUT: api/trucks/{id}
-        // Updates an existing truck in the database
         [HttpPut("{id}")]
         public IActionResult UpdateTruck(int id, [FromBody] Truck truck)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var existingTruck = _context.Trucks.FirstOrDefault(t => t.TruckId == id);
+            var existingTruck = _context.Trucks.FirstOrDefault(t => t.key1 == id);
             if (existingTruck == null)
                 return NotFound();
 
-            existingTruck.DriverId = truck.DriverId;
-            existingTruck.Description = truck.Description;
+            existingTruck.character02 = truck.character02;
+            existingTruck.character01 = truck.character01;
 
             _context.SaveChanges();
 
             return Ok(existingTruck);
         }
 
-        // DELETE: api/trucks/{id}
-        // Deletes a truck from the database
         [HttpDelete("{id}")]
         public IActionResult DeleteTruck(int id)
         {
-            var truck = _context.Trucks.FirstOrDefault(t => t.TruckId == id);
+            var truck = _context.Trucks.FirstOrDefault(t => t.key1 == id);
             if (truck == null)
                 return NotFound();
 
@@ -88,8 +79,6 @@ namespace Truck_Microservice.Controllers
             return Ok(truck);
         }
 
-        // GET: api/trucks/epicor/load/{id}
-        // Loads stock data from Epicor for a specific truck
         [HttpGet("epicor/load/{id}")]
         public async Task<IActionResult> LoadTruckFromEpicor(int id)
         {
@@ -101,8 +90,6 @@ namespace Truck_Microservice.Controllers
             return Ok(stock);
         }
 
-        // GET: api/trucks/epicor/offload/{id}
-        // Offloads stock data from Epicor for a specific truck
         [HttpGet("epicor/offload/{id}")]
         public async Task<IActionResult> OffloadTruckFromEpicor(int id)
         {

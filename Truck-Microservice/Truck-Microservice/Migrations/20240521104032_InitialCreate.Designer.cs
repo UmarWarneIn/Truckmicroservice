@@ -5,9 +5,10 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Truck_Microservice.Data;
 using Truck_Microservice.Models;
 
-#nullable disable
+
 
 namespace Truck_Microservice.Migrations
 {

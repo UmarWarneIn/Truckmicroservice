@@ -1,7 +1,7 @@
-﻿
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Truck_Microservice.Data;
 using Truck_Microservice.Models;
 
 namespace Truck_Microservice.Controllers
@@ -27,11 +27,7 @@ namespace Truck_Microservice.Controllers
             // Implement validation logic here
 
             // Assuming successful validation, proceed with loading
-            foreach (var item in request.Items)
-            {
-                _context.StockItems.Add(item);
-            }
-
+            _context.StockItems.AddRange(request.Items);
             await _context.SaveChangesAsync();
 
             return Ok(request);

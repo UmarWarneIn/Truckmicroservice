@@ -4,7 +4,7 @@ namespace Truck_Microservice.Models
 {
     public class StockLoadingRequest
     {
-        public int TruckId { get; set; }
+        public int key1  { get; set; }
         public List<StockItem>? Items { get; set; }
     }
 }

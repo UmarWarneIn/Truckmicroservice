@@ -8,15 +8,12 @@ namespace Truck_Microservice.Models
 {
     public class Truck
     {
-        public int TruckId { get; set; }
-        public int DriverId { get; set; }
-        public string? Description { get; set; } // Declare as nullable
+        public int key1 { get; set; }
+        public int character02 { get; set; }
+        public string? character01   { get; set; } // Declare as nullable
 
         // Add other properties if necessary
 
-        public Truck()
-        {
-            Description = string.Empty; // Initialize in the constructor
-        }
+       
     }
 }
